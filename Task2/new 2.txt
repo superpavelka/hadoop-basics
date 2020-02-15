@@ -1,0 +1,4 @@
+/bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar \
+-file /home/student2_11/mapper.py    -mapper /home/student2_11/mapper.py \
+-file /home/student2_11/reducer.py   -reducer /home/student2_11/reducer.py \
+-input /user/student2_11/* -output /user/student2_11/-output
