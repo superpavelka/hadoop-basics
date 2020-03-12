@@ -74,13 +74,7 @@ totalprofit decimal(10,0))
 STORED AS AVRO;
 sqoop import --connect jdbc:postgresql://node3.novalocal/pg_db --username exporter -P --table sales_large --hive-import --hive-database pg_db_test -m 1
 
-sqoop import --connect jdbc:postgresql://node3.novalocal/pg_db --username exporter -P --table character --hive-import --hive-database pg_db_test --hive-table character_avro --as-avrodatafile
-
-sqoop import --connect jdbc:postgresql://node3.novalocal/pg_db --username exporter -P --table character --hive-import --hive-database pg_db_test --hive-table character_orc --as-sequencefile
-
-sqoop import --connect jdbc:postgresql://node3.novalocal/pg_db --username exporter -P --table character --target-dir /user/hive/warehouse/character_avro --as-avrodatafile
-
-
+sqoop import --connect jdbc:postgresql://node3.novalocal/pg_db --username exporter -P --table character --as-avrodatafile --target-dir /user/hive/warehouse/pg_db_test.db/character_avro
 
 --compression-codec org.apache.org.io.compress.GzipCodec
 
