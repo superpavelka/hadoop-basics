@@ -1,0 +1,90 @@
+CREATE TABLE `pg_db_test.character_parquet` (
+        `charid` string,
+        `charname` string,
+        `abbrev` string,
+        `description` string,
+        `speechcount` int)
+        ROW FORMAT SERDE
+        'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+        STORED AS INPUTFORMAT
+        'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
+        OUTPUTFORMAT
+        'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+        LOCATION
+        'hdfs://manager.novalocal:8020/user/hive/warehouse/character_parquet'
+        TBLPROPERTIES (
+        'COLUMN_STATS_ACCURATE' = 'false',
+        'avro.schema.url'='snappy',
+        'numFiles' = '0',
+        'numRows' = '-1',
+        'rawDatasize' = '-1',
+        'totalSize' = '0',
+        'transient_lastDdlTime' = '1576000949')
+		
+		sqoop import --connect jdbc:postgresql://node3.novalocal/pg_db --username exporter -P --table character --hive-import --hive-database pg_db_test --as-parquetfile
+
+		SET avro.output.codec=none;
+
+CREATE TABLE work (
+workid varchar(32),
+title varchar(32),
+longtitle varchar(64),
+`year` int,
+genretype varchar(1),
+notes varchar(65535),
+source varchar(16),
+totalwords int,
+totalparagraphs int)
+STORED AS AVRO;
+
+CREATE TABLE pg_db_test.sales_large (
+region varchar(65535),
+country varchar(65535),
+itemtype varchar(65535),
+saleschannel varchar(65535),
+orderpriority varchar(65535),
+orderdate varchar(65535),
+orderid int,
+shipdate varchar(65535),
+unitssold decimal(10,0),
+unitprice decimal(10,0),
+unitcost decimal(10,0),
+totalrevenue decimal(10,0),
+totalcost decimal(10,0),
+totalprofit decimal(10,0))
+STORED AS ORC
+TBLPROPERTIES ("orc.compress"="NONE");
+
+SET avro.output.codec=gzip;
+CREATE TABLE pg_db_test.sales_large (
+region varchar(65535),
+country varchar(65535),
+itemtype varchar(65535),
+saleschannel varchar(65535),
+orderpriority varchar(65535),
+orderdate varchar(65535),
+orderid int,
+shipdate varchar(65535),
+unitssold decimal(10,0),
+unitprice decimal(10,0),
+unitcost decimal(10,0),
+totalrevenue decimal(10,0),
+totalcost decimal(10,0),
+totalprofit decimal(10,0))
+STORED AS AVRO;
+sqoop import --connect jdbc:postgresql://node3.novalocal/pg_db --username exporter -P --table sales_large --hive-import --hive-database pg_db_test -m 1
+
+sqoop import --connect jdbc:postgresql://node3.novalocal/pg_db --username exporter -P --table character --hive-import --hive-database pg_db_test --hive-table character_avro --as-avrodatafile
+
+sqoop import --connect jdbc:postgresql://node3.novalocal/pg_db --username exporter -P --table character --hive-import --hive-database pg_db_test --hive-table character_orc --as-sequencefile
+
+sqoop import --connect jdbc:postgresql://node3.novalocal/pg_db --username exporter -P --table character --target-dir /user/hive/warehouse/character_avro --as-avrodatafile
+
+
+
+--compression-codec org.apache.org.io.compress.GzipCodec
+
+
+    sqoop import --connect jdbc:mysql://localhost/export \
+
+    --username root --password cloudera --table cust \ --target-dir /user/hive/warehouse/cust \ --compression-codec org.apache.org.io.compress.GzipCodec \ --as-avrodatafile -m 1
